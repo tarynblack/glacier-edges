@@ -12,15 +12,17 @@ import matplotlib.pyplot as plt
 init_path = r"/home/courtney/Desktop/practice/"
 os.chdir(init_path)
 
-glaciers_txt = init_path + "glaciers.txt"
-mosaics_path = init_path + "mosaics50m/"
+glaciers_path = r"/home/courtney/Desktop/practice/glaciers.txt"
+mosaics_path = r"/home/courtney/Desktop/practice/mosaics50m/"
+chips_path = r"/home/courtney/Desktop/practice/chips/"
 dated_directories = sorted(os.listdir(mosaics_path))  #TODO formatting
 
 
 def Get_vrt(date):
     '''
     Returns the .vrt file associated with a particular
-    date in time in which radar imagery was captured
+    directory labeled with the date in which radar imagery
+    was captured
     '''
     for file in os.listdir(date):
         if file.endswith('.vrt'):
@@ -38,11 +40,13 @@ def Create_chips(vrt, date, glacier_info):
         glacier_coords = line.split(' ')
         subprocess.call(['gdalwarp', '-t_srs', 'EPSG:3413', '-te', glacier_coords[1], glacier_coords[2], glacier_coords[3], glacier_coords[4], '-tr', '50', '50', vrt, glacier_coords[0]+'.'+date+'.tif'])
 
+
 for date in dated_directories:
-    os.chdir(mosaics_path+date)
-    path = os.getcwd()
-    vrt = Get_vrt(path)
-    Create_chips(vrt, date, glaciers_txt)
+    date_path = mosaics_path + date
+    os.chdir(date_path)
+    vrt_path = date_path + '/' + Get_vrt(date_path)
+    os.chdir(chips_path)
+    Create_chips(vrt_path, date, glaciers_path)
     
 '''
 subprocess.call("./cutchips", shell=True)
